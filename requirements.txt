@@ -4,5 +4,6 @@ numpy
 matplotlib
 pymongo
 certifi
-
+dotenv
+pymongo[srv]
 ##-e .
