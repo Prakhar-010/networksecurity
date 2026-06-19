@@ -5,5 +5,7 @@ matplotlib
 pymongo
 certifi
 dotenv
+datetime
 pymongo[srv]
+scikit-learn
 ##-e .
