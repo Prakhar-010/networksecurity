@@ -1,2 +1,6 @@
 venv
 .env
+freshenv/
+freshenv312/
+freshenv313/
+venv/

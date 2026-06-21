@@ -1,8 +1,0 @@
-[2026-06-20 04:50:26,404] 33 root - INFO - required number of columns:2
-[2026-06-20 04:50:26,405] 34 root - INFO - dataframe has  number of columns:31
-[2026-06-20 04:50:26,405] 33 root - INFO - required number of columns:2
-[2026-06-20 04:50:26,405] 34 root - INFO - dataframe has  number of columns:31
-[2026-06-20 04:50:26,597] 45 root - INFO - entered initiate_data_transformation method of DataTransformation class
-[2026-06-20 04:50:26,717] 37 root - INFO - entered the get_transformed_data function
-[2026-06-20 04:50:26,758] 50 root - INFO - Saving object to: Artifacts\06_20_2026_04_50_16\data_transformation\transformed_object\preprocessing.pkl
-[2026-06-20 04:50:26,761] 55 root - INFO - Successfully saved object to: Artifacts\06_20_2026_04_50_16\data_transformation\transformed_object\preprocessing.pkl
