@@ -4,7 +4,7 @@ import pandas as pd
 from networksecurity.utils.main_utils.utils import load_object
 import certifi
 from networksecurity.utils.ml_utils.model.estimator import NetworkModel
-
+from uvicorn import run as app_run
 ca = certifi.where()
 
 from dotenv import load_dotenv
