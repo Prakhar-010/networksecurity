@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan Results — Network Security</title>
+<style>
+  :root {
+    --bg: #0a0e0f;
+    --panel: #11171a;
+    --line: #1f2a2e;
+    --text: #d8e3e3;
+    --muted: #6b7c7e;
+    --safe: #3ddc97;
+    --flag: #ff5c5c;
+    --accent: #7fd1ff;
+    --mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(127,209,255,0.05), transparent 40%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .scan-header {
+    border-bottom: 1px solid var(--line);
+    padding: 28px 5vw 22px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .scan-header .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .scan-header .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--safe);
+    box-shadow: 0 0 8px var(--safe);
+    flex-shrink: 0;
+  }
+
+  .scan-header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .scan-header .meta {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .summary-strip {
+    display: flex;
+    gap: 1px;
+    background: var(--line);
+    margin: 0 5vw;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .summary-cell {
+    flex: 1;
+    background: var(--panel);
+    padding: 16px 18px;
+    min-width: 130px;
+  }
+
+  .summary-cell .label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .summary-cell .value {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .summary-cell.flagged .value { color: var(--flag); }
+  .summary-cell.clean .value { color: var(--safe); }
+
+  .results-section {
+    padding: 28px 5vw 80px;
+  }
+
+  .results-section .section-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .results-section .section-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .table-shell {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--panel);
+  }
+
+  .table-shell table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .table-shell thead th {
+    text-align: left;
+    padding: 12px 16px;
+    background: #161d20;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  .table-shell tbody td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .table-shell tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .table-shell tbody tr:hover {
+    background: #141b1e;
+  }
+
+  /* Highlight the predicted-result column values when present */
+  .table-shell td:has-text {
+    /* fallback noop, real logic applied via JS class below */
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .pill.safe {
+    background: rgba(61,220,151,0.12);
+    color: var(--safe);
+    border: 1px solid rgba(61,220,151,0.3);
+  }
+
+  .pill.flag {
+    background: rgba(255,92,92,0.12);
+    color: var(--flag);
+    border: 1px solid rgba(255,92,92,0.3);
+  }
+
+  .footnote {
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 640px) {
+    .summary-strip { flex-wrap: wrap; }
+    .summary-cell { min-width: 45%; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="scan-header">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>Network Security // Scan Results</h1>
+    </div>
+    <div class="meta">model: ensemble classifier &nbsp;·&nbsp; rendered client-side</div>
+  </div>
+
+  <div class="summary-strip" id="summaryStrip">
+    <div class="summary-cell">
+      <div class="label">Records Scanned</div>
+      <div class="value" id="totalCount">—</div>
+    </div>
+    <div class="summary-cell flagged">
+      <div class="label">Flagged</div>
+      <div class="value" id="flaggedCount">—</div>
+    </div>
+    <div class="summary-cell clean">
+      <div class="label">Clean</div>
+      <div class="value" id="cleanCount">—</div>
+    </div>
+  </div>
+
+  <div class="results-section">
+    <div class="section-label">Prediction output</div>
+    <div class="table-shell">
+      <div class="table-scroll">
+        {{ table | safe }}
+      </div>
+    </div>
+    <div class="footnote">Rows are colored by the predicted_column value where 1 = flagged, 0 = clean. Scroll horizontally to see all features.</div>
+  </div>
+
+<script>
+  // Lightweight enhancement: find the predicted_column in the injected table
+  // and visually tag rows + populate the summary counts, without touching
+  // the server-side rendering contract (table | safe stays untouched).
+  (function () {
+    const table = document.querySelector('.table-shell table');
+    if (!table) return;
+
+    const headerCells = Array.from(table.querySelectorAll('thead th, tr:first-child th, tr:first-child td'));
+    let predIndex = -1;
+    headerCells.forEach((cell, i) => {
+      const text = cell.textContent.trim().toLowerCase();
+      if (text.includes('predict') || text === 'result') predIndex = i;
+    });
+
+    const bodyRows = table.querySelectorAll('tbody tr');
+    let flagged = 0, clean = 0;
+
+    const rows = bodyRows.length ? bodyRows : Array.from(table.querySelectorAll('tr')).slice(1);
+
+    rows.forEach(row => {
+      if (predIndex === -1) return;
+      const cells = row.querySelectorAll('td');
+      const cell = cells[predIndex];
+      if (!cell) return;
+      const raw = cell.textContent.trim();
+
+      const isFlag = raw === '1' || raw.toLowerCase() === 'true' || raw.toLowerCase().includes('phish') || raw.toLowerCase().includes('malicious');
+      const isSafe = raw === '0' || raw.toLowerCase() === 'false' || raw.toLowerCase().includes('legit') || raw.toLowerCase().includes('safe');
+
+      if (isFlag) {
+        flagged++;
+        cell.innerHTML = '<span class="pill flag">● flagged</span>';
+      } else if (isSafe) {
+        clean++;
+        cell.innerHTML = '<span class="pill safe">● clean</span>';
+      }
+    });
+
+    document.getElementById('totalCount').textContent = rows.length;
+    document.getElementById('flaggedCount').textContent = flagged;
+    document.getElementById('cleanCount').textContent = clean;
+
+    if (flagged === 0 && rows.length > 0) {
+      document.querySelector('.dot').style.background = '#3ddc97';
+    } else if (flagged > 0) {
+      document.querySelector('.dot').style.background = '#ff5c5c';
+      document.querySelector('.dot').style.boxShadow = '0 0 8px #ff5c5c';
+    }
+  })();
+</script>
+
+</body>
+</html>

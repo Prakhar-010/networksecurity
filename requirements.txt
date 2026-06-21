@@ -11,4 +11,6 @@ scikit-learn
 dill
 pyaml
 mlflow==2.9.2
+fastapi
+uvicorn
 ##-e .
